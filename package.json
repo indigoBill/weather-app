@@ -1,5 +1,5 @@
 {
-  "name": "webpack-template",
+  "name": "weather-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -27,5 +27,9 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.2",
     "webpack-merge": "^5.10.0"
+  },
+  "dependencies": {
+    "date-fns": "^3.3.1",
+    "pubsub-js": "^1.9.4"
   }
 }
