@@ -15,7 +15,7 @@ export function createCurrWeatherObj(dataObj){
     const windKph = dataObj.current.wind_kph;
     const precipInches = dataObj.current.precip_in;
     const precipMm = dataObj.current.precip_mm;
-    const humidity = dataObj.current.humidity;
+    const {humidity} = dataObj.current;
     const tempFeelF = dataObj.current.feelslike_f;
     const tempFeelC = dataObj.current.feelslike_c;
     
