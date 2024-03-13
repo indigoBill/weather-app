@@ -1,16 +1,14 @@
 import PubSub from 'pubsub-js';
 import { format, add } from 'date-fns';
-import { getWeatherData } from './api.js';
-import { createCurrWeatherObj, createDailyWeatherObj, createHourlyWeatherObj } from './logic.js';
-import { LAYOUT, CLEAR_DOM, CHANGE_UNITS, createCurrWeatherDomObj, createDailyWeatherDomObj, createHourlyWeatherDomObj } from './dom.js';
+import { getWeatherData } from './api';
+import { createCurrWeatherObj, createDailyWeatherObj, createHourlyWeatherObj } from './logic';
+import { LAYOUT, CLEAR_DOM, CHANGE_UNITS, EVENT_LISTENERS, createCurrWeatherDomObj, createDailyWeatherDomObj, createHourlyWeatherDomObj, createHourlyGroup, addHourlyWeatherToGroup, createDailyGroup, addDailyWeatherToGroup } from './dom';
 import './style.css';
 
-export const EVENT_LISTENERS = 'add all event listeners to the page';
-
-let city;
+let location = 'new york';
 
 async function getAllWeatherInfo(){
-    const weatherData = await getWeatherData(city);
+    const weatherData = await getWeatherData(location);
     const currWeatherData = weatherData.currWeatherResponseBody;
     const dailyAndHourlyData = weatherData.dailyHourlyWeatherResponseBody;
     const hourObjArr = [];
@@ -20,32 +18,58 @@ async function getAllWeatherInfo(){
         const lastWeatherUpdate = currWeather.lastUpdatedDate;
         const nextHour = add(lastWeatherUpdate, { hours: 1 });
         const formattedHour = Number(format(nextHour, 'HH'));
+        let hourlyGroupNum = 0;
 
         createCurrWeatherDomObj(currWeather);
-        // console.log(currWeather);
 
-        for(let dataInfoIndex = 0; dataInfoIndex <= 2; dataInfoIndex++){
-            const dailyWeather = await createDailyWeatherObj(dailyAndHourlyData, dataInfoIndex);
-            createDailyWeatherDomObj(dailyWeather);
-            // console.log(dailyWeather);
+        createDailyGroup();
+
+        for(let dataInfoIndex = 0; dataInfoIndex <= 2; dataInfoIndex+=1){
+            const dailyWeather = createDailyWeatherObj(dailyAndHourlyData, dataInfoIndex);
+            addDailyWeatherToGroup(createDailyWeatherDomObj(dailyWeather));
         }
 
-        outer: 
-        for (let dayDataIndex = 0; dayDataIndex <= 1; dayDataIndex++){
+        for (let dayDataIndex = 0; dayDataIndex <= 1; dayDataIndex+=1){
 
             let hourDataIndex = dayDataIndex === 0 ? formattedHour : 0;
 
-            for( ; hourDataIndex <= 23; hourDataIndex++){
-                const hourlyWeather = await createHourlyWeatherObj(dailyAndHourlyData, dayDataIndex, hourDataIndex);
+            for( ; hourDataIndex <= 23; hourDataIndex += 1){
+                const hourlyWeather = createHourlyWeatherObj(dailyAndHourlyData, dayDataIndex, hourDataIndex);
 
-                if(hourObjArr.length == 24){
-                    break outer;
+                if(hourObjArr.length === 24){
+                    break;
+                }
+
+                if(hourObjArr.length % 8 === 0){
+                    hourlyGroupNum+=1;
+                    createHourlyGroup(hourlyGroupNum);
                 }
 
                 hourObjArr.push(hourlyWeather);
-                createHourlyWeatherDomObj(hourlyWeather);
-                // console.log(hourlyWeather);
+
+                addHourlyWeatherToGroup(hourlyGroupNum, createHourlyWeatherDomObj(hourlyWeather));
             }
+        }
+
+        return true;
+    }
+    
+    return false;
+}
+
+async function checkForValidEntry(event){
+    const searchBar = event.target;
+    let displayResults;
+
+    if(event.key === 'Enter'){    
+        event.preventDefault();
+    
+        location = searchBar.value;
+        displayResults = await getAllWeatherInfo();
+
+        if(displayResults){
+            PubSub.publish(CLEAR_DOM);
+            getAllWeatherInfo();
         }
     }
 }
@@ -54,37 +78,16 @@ function addAllEventListeners(){
     const searchBar = document.querySelector('#search');
     const unitBtn = document.querySelector('.unit-btn');
 
-    searchBar.addEventListener('keydown', () => {
-        if(event.key === 'Enter'){
-            event.preventDefault();
-            
-            city = searchBar.value;
-            getAllWeatherInfo();
-
-            PubSub.publish(CLEAR_DOM);
-        }
-    });
+    searchBar.addEventListener('keydown', checkForValidEntry);
 
     unitBtn.addEventListener('click', () => {
         PubSub.publish(CHANGE_UNITS);
     });
-    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     PubSub.publish(LAYOUT);
+    getAllWeatherInfo();
 });
 
 PubSub.subscribe(EVENT_LISTENERS, addAllEventListeners);
-
-
-
-
-
-
-
-
-
-
-
-
