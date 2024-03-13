@@ -1,9 +1,12 @@
 import PubSub from 'pubsub-js';
-import { EVENT_LISTENERS } from './barrel';
+
+import { DISPLAY_ERROR, HIDE_ERROR } from './api';
 
 export const LAYOUT = 'load page elements';
 export const CLEAR_DOM = 'remove any existing dom elements except the search bar';
 export const CHANGE_UNITS = 'change the units that are being displayed';
+export const EVENT_LISTENERS = 'add all event listeners to the page';
+
 const body = document.querySelector('body');
 
 function createUserInputField(){
@@ -12,33 +15,46 @@ function createUserInputField(){
     const label = document.createElement('label');
     const input = document.createElement('input');
 
-    label.textContent = 'SEARCH';
+    label.textContent = 'SEARCH:';
 
     label.setAttribute('for', 'search');
     input.setAttribute('type', 'text');
     input.setAttribute('name', 'search');
     input.setAttribute('id', 'search');
+    input.setAttribute('placeholder', 'ENTER ZIPCODE OR CITY');
     
     form.appendChild(inputContainer);
     inputContainer.appendChild(label);
     inputContainer.appendChild(input);
-    body.appendChild(form);
 
     PubSub.publish(EVENT_LISTENERS);
+
+    return form;
 }
 
 function createUnitsToggleBtn(){
     const unitToggleBtn = document.createElement('button');
 
     unitToggleBtn.classList.add('unit-btn');
+    unitToggleBtn.textContent = '°F / °C';
 
-    unitToggleBtn.textContent = 'F/C';
+    return unitToggleBtn
+}
 
-    body.appendChild(unitToggleBtn);
+function createHeader(){
+    const header = document.createElement('header');
+
+    header.appendChild(createUserInputField());
+    header.appendChild(createUnitsToggleBtn());
+
+    body.appendChild(header);
 }
 
 export function createCurrWeatherDomObj(obj){
     const weatherInfoContainer = document.createElement('div');
+    const leftContainer = document.createElement('div');
+    const rightContainer = document.createElement('div');
+    const tempAndIconContainer = document.createElement('div');
     const locationName = document.createElement('p');
     const date = document.createElement('p');
     const lastUpdatedTime = document.createElement('p');
@@ -58,7 +74,17 @@ export function createCurrWeatherDomObj(obj){
     const tempFeelF = document.createElement('p');
     const tempFeelC = document.createElement('p');
 
+    weatherInfoContainer.classList.add('curr-weather');
     weatherInfoContainer.classList.add('weather-info');
+    tempContainer.classList.add('temp-container');
+    windContainer.classList.add('wind-container');
+    precipContainer.classList.add('precip-container');
+    tempFeelContainer.classList.add('temp-feel-container');
+    tempAndIconContainer.classList.add('temp-icon-container');
+
+    locationName.classList.add('curr-location');
+    conditionText.classList.add('curr-condition-text');
+
     tempF.classList.add('units', 'us-units');
     windMph.classList.add('units', 'us-units');
     precipInches.classList.add('units', 'us-units');
@@ -71,18 +97,18 @@ export function createCurrWeatherDomObj(obj){
 
     locationName.textContent = obj.locationName;
     date.textContent = obj.date;
-    lastUpdatedTime.textContent = `LAST UPDATED: ${obj.lastUpdatedTime}`;
+    lastUpdatedTime.textContent = `Last Updated: ${obj.lastUpdatedTime}`;
     tempF.textContent = `${obj.tempF}°F`;
     tempC.textContent = `${obj.tempC}°C`;
     conditionText.textContent = obj.conditionText;
     conditionIcon.setAttribute('src', obj.conditionIcon);
-    windMph.textContent = `WIND: ${obj.windMph}MPH`;
-    windKph.textContent = `WIND: ${obj.windKph}KPH`;
-    precipInches.textContent = `PRECIP: ${obj.precipInches}IN`;
-    precipMm.textContent = `PRECIP: ${obj.precipMm}MM`;
-    humidity.textContent = `HUMIDITY: ${obj.humidity}%`;
-    tempFeelF.textContent = `FEELS LIKE: ${obj.tempFeelF}°F`;
-    tempFeelC.textContent = `FEELS LIKE: ${obj.tempFeelC}°C`;
+    windMph.textContent = `Wind: ${obj.windMph}mph`;
+    windKph.textContent = `Wind: ${obj.windKph}kph`;
+    precipInches.textContent = `Precipitation: ${obj.precipInches}in`;
+    precipMm.textContent = `Precipitation: ${obj.precipMm}mm`;
+    humidity.textContent = `Humidity: ${obj.humidity}%`;
+    tempFeelF.textContent = `Feels Like: ${obj.tempFeelF}°F`;
+    tempFeelC.textContent = `Feels Like: ${obj.tempFeelC}°C`;
     
     tempContainer.appendChild(tempF);
     tempContainer.appendChild(tempC);
@@ -93,16 +119,22 @@ export function createCurrWeatherDomObj(obj){
     tempFeelContainer.appendChild(tempFeelF);
     tempFeelContainer.appendChild(tempFeelC);
 
-    weatherInfoContainer.appendChild(locationName);
-    weatherInfoContainer.appendChild(date);
-    weatherInfoContainer.appendChild(lastUpdatedTime);
-    weatherInfoContainer.appendChild(tempContainer);
-    weatherInfoContainer.appendChild(conditionText);
-    weatherInfoContainer.appendChild(conditionIcon);
-    weatherInfoContainer.appendChild(windContainer);
-    weatherInfoContainer.appendChild(precipContainer);
-    weatherInfoContainer.appendChild(humidity);
-    weatherInfoContainer.appendChild(tempFeelContainer);
+    leftContainer.appendChild(conditionText);
+    leftContainer.appendChild(locationName);
+    leftContainer.appendChild(date);
+    leftContainer.appendChild(tempAndIconContainer);
+    leftContainer.appendChild(lastUpdatedTime);
+
+    tempAndIconContainer.appendChild(tempContainer);
+    tempAndIconContainer.appendChild(conditionIcon);
+
+    rightContainer.appendChild(windContainer);
+    rightContainer.appendChild(precipContainer);
+    rightContainer.appendChild(humidity);
+    rightContainer.appendChild(tempFeelContainer);
+
+    weatherInfoContainer.appendChild(leftContainer);
+    weatherInfoContainer.appendChild(rightContainer);
 
     body.appendChild(weatherInfoContainer);
 }
@@ -118,7 +150,11 @@ export function createDailyWeatherDomObj(obj){
     const minTempF = document.createElement('p');
     const minTempC = document.createElement('p');
 
+    dailyWeatherInfoContainer.classList.add('daily-weather');
     dailyWeatherInfoContainer.classList.add('weather-info');
+    maxTempContainer.classList.add('max-temp-container');
+    minTempContainer.classList.add('min-temp-container');
+
     maxTempF.classList.add('units', 'us-units');
     minTempF.classList.add('units', 'us-units');
     maxTempC.classList.add('units', 'metric-units', 'hide');
@@ -141,7 +177,8 @@ export function createDailyWeatherDomObj(obj){
     dailyWeatherInfoContainer.appendChild(maxTempContainer);
     dailyWeatherInfoContainer.appendChild(minTempContainer);
 
-    body.appendChild(dailyWeatherInfoContainer);
+    // body.appendChild(dailyWeatherInfoContainer);
+    return dailyWeatherInfoContainer;
 }
 
 export function createHourlyWeatherDomObj(obj){
@@ -152,7 +189,8 @@ export function createHourlyWeatherDomObj(obj){
     const tempF = document.createElement('p');
     const tempC = document.createElement('p');
 
-    hourlyWeatherInfoContainer.classList.add('weather-info');
+    hourlyWeatherInfoContainer.classList.add('hourly-weather');
+    tempContainer.classList.add('hourly-temp-container');
     tempF.classList.add('units', 'us-units');
     tempC.classList.add('units', 'metric-units', 'hide');
 
@@ -168,17 +206,43 @@ export function createHourlyWeatherDomObj(obj){
     hourlyWeatherInfoContainer.appendChild(conditionIcon);
     hourlyWeatherInfoContainer.appendChild(tempContainer);
 
-    body.appendChild(hourlyWeatherInfoContainer);
+    return hourlyWeatherInfoContainer;
 }
 
-// function createHourlyWeatherDomObjContainer(){
-//     const hourlyWeatherContainer = document.createElement('div');
+export function createDailyGroup(){
+    const dailyGroup = document.createElement('div');
 
-// }
+    dailyGroup.classList.add('daily-group');
+    dailyGroup.classList.add('weather-info');
+
+    body.appendChild(dailyGroup);
+}
+
+export function addDailyWeatherToGroup(domObj){
+    const dailyGroup = document.querySelector('.daily-group');
+
+    dailyGroup.appendChild(domObj);
+}
+
+export function createHourlyGroup(groupNum){
+    const hourlyWeatherGrouping = document.createElement('div');
+
+    hourlyWeatherGrouping.classList.add(`hour-group-${groupNum}`);
+    hourlyWeatherGrouping.classList.add('hour-group');
+    hourlyWeatherGrouping.classList.add('weather-info');
+
+    body.appendChild(hourlyWeatherGrouping);
+}
+
+export function addHourlyWeatherToGroup(groupNum, domObj){
+    const hourlyGroup = document.querySelector(`.hour-group-${groupNum}`);
+
+    hourlyGroup.appendChild(domObj);
+}
 
 function toggleUnitDisplay(){
     const unitsToHide = document.querySelectorAll('.units:not(.hide)');
-    const unitsToShow = document.querySelectorAll('.hide');
+    const unitsToShow = document.querySelectorAll('.units.hide');
 
     if(unitsToShow.length > 0){
         unitsToShow.forEach((unit) => {
@@ -203,7 +267,33 @@ function clearDom(){
     }
 }
 
-PubSub.subscribe(LAYOUT, createUserInputField);
-PubSub.subscribe(LAYOUT, createUnitsToggleBtn);
+function createErrorMessage(){
+    const errorMessage = document.createElement('div');
+    errorMessage.textContent = 'ERROR';
+
+    errorMessage.classList.add('error');
+    errorMessage.classList.add('hide');
+
+    body.appendChild(errorMessage);
+}
+
+function displayErrorMessageDisplay(){
+    const errorMessage = document.querySelector('.error');
+
+    errorMessage.classList.remove('hide');
+}
+
+function hideErrorMessageDisplay(){
+    const errorMessage = document.querySelector('.error');
+
+    errorMessage.classList.add('hide');
+}
+
+PubSub.subscribe(DISPLAY_ERROR, displayErrorMessageDisplay);
+PubSub.subscribe(HIDE_ERROR, hideErrorMessageDisplay);
+
+
+PubSub.subscribe(LAYOUT, createHeader);
+PubSub.subscribe(LAYOUT, createErrorMessage);
 PubSub.subscribe(CHANGE_UNITS, toggleUnitDisplay);
 PubSub.subscribe(CLEAR_DOM, clearDom);
