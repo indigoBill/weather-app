@@ -9,6 +9,28 @@ export const EVENT_LISTENERS = 'add all event listeners to the page';
 
 const body = document.querySelector('body');
 
+function createPageLogo(){
+    const logoContainer = document.createElement('div');
+    const logoName = document.createElement('p');
+    const svgIconContainer = document.createElement('div');
+    const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+    logoContainer.classList.add('logo-container');
+    logoName.classList.add('logo-name');
+    svgIconContainer.classList.add('svg-icon-container');
+
+    logoName.textContent = 'WeatherGo';
+    svgIcon.setAttribute('viewBox', '0 0 24 24');
+    path.setAttribute('d', "M12.74,5.47C15.1,6.5 16.35,9.03 15.92,11.46C17.19,12.56 18,14.19 18,16V16.17C18.31,16.06 18.65,16 19,16A3,3 0 0,1 22,19A3,3 0 0,1 19,22H6A4,4 0 0,1 2,18A4,4 0 0,1 6,14H6.27C5,12.45 4.6,10.24 5.5,8.26C6.72,5.5 9.97,4.24 12.74,5.47M11.93,7.3C10.16,6.5 8.09,7.31 7.31,9.07C6.85,10.09 6.93,11.22 7.41,12.13C8.5,10.83 10.16,10 12,10C12.7,10 13.38,10.12 14,10.34C13.94,9.06 13.18,7.86 11.93,7.3M13.55,3.64C13,3.4 12.45,3.23 11.88,3.12L14.37,1.82L15.27,4.71C14.76,4.29 14.19,3.93 13.55,3.64M6.09,4.44C5.6,4.79 5.17,5.19 4.8,5.63L4.91,2.82L7.87,3.5C7.25,3.71 6.65,4.03 6.09,4.44M18,9.71C17.91,9.12 17.78,8.55 17.59,8L19.97,9.5L17.92,11.73C18.03,11.08 18.05,10.4 18,9.71M3.04,11.3C3.11,11.9 3.24,12.47 3.43,13L1.06,11.5L3.1,9.28C3,9.93 2.97,10.61 3.04,11.3M19,18H16V16A4,4 0 0,0 12,12A4,4 0 0,0 8,16H6A2,2 0 0,0 4,18A2,2 0 0,0 6,20H19A1,1 0 0,0 20,19A1,1 0 0,0 19,18Z");
+
+    svgIcon.appendChild(path);
+    svgIconContainer.appendChild(svgIcon);
+    logoContainer.appendChild(logoName);
+    logoContainer.appendChild(svgIconContainer);
+
+    return logoContainer;
+}
 function createUserInputField(){
     const form = document.createElement('form');
     const inputContainer = document.createElement('div');
@@ -33,21 +55,30 @@ function createUserInputField(){
 }
 
 function createUnitsToggleBtn(){
+    const unitBtnContainer = document.createElement('div');
     const unitToggleBtn = document.createElement('button');
 
+    unitBtnContainer.classList.add('unit-btn-container');
     unitToggleBtn.classList.add('unit-btn');
-    unitToggleBtn.textContent = '°F / °C';
 
-    return unitToggleBtn
+    unitToggleBtn.textContent = '°F / °C';
+    unitBtnContainer.appendChild(unitToggleBtn);
+
+    return unitBtnContainer;
 }
 
 function createHeader(){
     const header = document.createElement('header');
 
+    header.appendChild(createPageLogo());
     header.appendChild(createUserInputField());
     header.appendChild(createUnitsToggleBtn());
 
     body.appendChild(header);
+}
+
+function addHourlyGroupBtnEventListeners(){
+    
 }
 
 export function createCurrWeatherDomObj(obj){
@@ -143,6 +174,7 @@ export function createDailyWeatherDomObj(obj){
     const dailyWeatherInfoContainer = document.createElement('div');
     const dayOfWeek = document.createElement('p');
     const conditionIcon = document.createElement('img');
+    const dailyTempContainer = document.createElement('div');
     const maxTempContainer = document.createElement('div');
     const maxTempF = document.createElement('p');
     const maxTempC = document.createElement('p');
@@ -152,6 +184,7 @@ export function createDailyWeatherDomObj(obj){
 
     dailyWeatherInfoContainer.classList.add('daily-weather');
     dailyWeatherInfoContainer.classList.add('weather-info');
+    dailyTempContainer.classList.add('daily-temp-container');
     maxTempContainer.classList.add('max-temp-container');
     minTempContainer.classList.add('min-temp-container');
 
@@ -162,10 +195,13 @@ export function createDailyWeatherDomObj(obj){
 
     dayOfWeek.textContent = obj.dayOfWeek;
     conditionIcon.setAttribute('src', obj.conditionIcon);
-    maxTempF.textContent = `HIGH: ${obj.maxTempF}°F`;
-    maxTempC.textContent = `HIGH: ${obj.maxTempC}°C`;
-    minTempF.textContent = `LOW: ${obj.minTempF}°F`;
-    minTempC.textContent = `LOW: ${obj.minTempC}°C`;
+    maxTempF.textContent = `${obj.maxTempF}°F`;
+    maxTempC.textContent = `${obj.maxTempC}°C`;
+    minTempF.textContent = `${obj.minTempF}°F`;
+    minTempC.textContent = `${obj.minTempC}°C`;
+
+    dailyTempContainer.appendChild(maxTempContainer);
+    dailyTempContainer.appendChild(minTempContainer);
 
     maxTempContainer.appendChild(maxTempF);
     maxTempContainer.appendChild(maxTempC);
@@ -174,10 +210,8 @@ export function createDailyWeatherDomObj(obj){
 
     dailyWeatherInfoContainer.appendChild(dayOfWeek);
     dailyWeatherInfoContainer.appendChild(conditionIcon);
-    dailyWeatherInfoContainer.appendChild(maxTempContainer);
-    dailyWeatherInfoContainer.appendChild(minTempContainer);
+    dailyWeatherInfoContainer.appendChild(dailyTempContainer);
 
-    // body.appendChild(dailyWeatherInfoContainer);
     return dailyWeatherInfoContainer;
 }
 
@@ -211,10 +245,17 @@ export function createHourlyWeatherDomObj(obj){
 
 export function createDailyGroup(){
     const dailyGroup = document.createElement('div');
+    const nameContainer = document.createElement('div');
+    const groupName = document.createElement('h3');
+
+    groupName.textContent = '3-Day Forecast';
 
     dailyGroup.classList.add('daily-group');
     dailyGroup.classList.add('weather-info');
-
+    nameContainer.classList.add('daily-name-container');
+    
+    nameContainer.appendChild(groupName);
+    dailyGroup.appendChild(nameContainer);
     body.appendChild(dailyGroup);
 }
 
@@ -224,14 +265,50 @@ export function addDailyWeatherToGroup(domObj){
     dailyGroup.appendChild(domObj);
 }
 
+export function createHourlyGroupContainer(){
+    const groupContainer = document.createElement('div');
+    const nameContainer = document.createElement('div');
+    const groupName = document.createElement('h3');
+    const btnContainer = document.createElement('div');
+    const leftBtn = document.createElement('button');
+    const grpBtn1 = document.createElement('button');
+    const grpBtn2 = document.createElement('button');
+    const grpBtn3 = document.createElement('button');
+    const rightBtn = document.createElement('button');
+
+    btnContainer.classList.add('hour-btns-container');
+    leftBtn.classList.add('hour-direction-btn');
+    rightBtn.classList.add('hour-direction-btn');
+    grpBtn1.classList.add('hour-btn');
+    grpBtn2.classList.add('hour-btn');
+    grpBtn3.classList.add('hour-btn');
+    nameContainer.classList.add('hourly-name-container');
+    groupContainer.classList.add('hourly-group-container');
+    groupContainer.classList.add('weather-info');
+
+    groupName.textContent = 'Hourly Forecast';
+
+    btnContainer.appendChild(leftBtn);
+    btnContainer.appendChild(grpBtn1);
+    btnContainer.appendChild(grpBtn2);
+    btnContainer.appendChild(grpBtn3);
+    btnContainer.appendChild(rightBtn);
+    nameContainer.appendChild(groupName);
+    groupContainer.appendChild(nameContainer);
+    groupContainer.appendChild(btnContainer);
+    body.appendChild(groupContainer);
+
+    addHourlyGroupBtnEventListeners();
+}
+
 export function createHourlyGroup(groupNum){
     const hourlyWeatherGrouping = document.createElement('div');
+    const parent = document.querySelector('.hourly-group-container');
 
     hourlyWeatherGrouping.classList.add(`hour-group-${groupNum}`);
     hourlyWeatherGrouping.classList.add('hour-group');
-    hourlyWeatherGrouping.classList.add('weather-info');
 
-    body.appendChild(hourlyWeatherGrouping);
+    parent.appendChild(hourlyWeatherGrouping);
 }
 
 export function addHourlyWeatherToGroup(groupNum, domObj){
@@ -291,8 +368,6 @@ function hideErrorMessageDisplay(){
 
 PubSub.subscribe(DISPLAY_ERROR, displayErrorMessageDisplay);
 PubSub.subscribe(HIDE_ERROR, hideErrorMessageDisplay);
-
-
 PubSub.subscribe(LAYOUT, createHeader);
 PubSub.subscribe(LAYOUT, createErrorMessage);
 PubSub.subscribe(CHANGE_UNITS, toggleUnitDisplay);
