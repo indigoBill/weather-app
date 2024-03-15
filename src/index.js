@@ -2,7 +2,7 @@ import PubSub from 'pubsub-js';
 import { format, add } from 'date-fns';
 import { getWeatherData } from './api';
 import { createCurrWeatherObj, createDailyWeatherObj, createHourlyWeatherObj } from './logic';
-import { LAYOUT, CLEAR_DOM, CHANGE_UNITS, EVENT_LISTENERS, createCurrWeatherDomObj, createDailyWeatherDomObj, createHourlyWeatherDomObj, createHourlyGroup, addHourlyWeatherToGroup, createDailyGroup, addDailyWeatherToGroup, createHourlyGroupContainer } from './dom';
+import { LAYOUT, CLEAR_DOM, CHANGE_UNITS, EVENT_LISTENERS, LOADER, createCurrWeatherDomObj, createDailyWeatherDomObj, createHourlyWeatherDomObj, createHourlyGroup, addHourlyWeatherToGroup, createDailyGroup, addDailyWeatherToGroup, createHourlyGroupContainer } from './dom';
 import './style.css';
 
 let location = 'new york';
@@ -71,7 +71,9 @@ async function checkForValidEntry(event){
 
         if(displayResults){
             PubSub.publish(CLEAR_DOM);
-            getAllWeatherInfo();
+            PubSub.publish(LOADER);
+            await getAllWeatherInfo();
+            PubSub.publish(LOADER);
         }
     }
 }
@@ -87,9 +89,11 @@ function addHeaderEventListeners(){
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     PubSub.publish(LAYOUT);
-    getAllWeatherInfo();
+    PubSub.publish(LOADER);
+    await getAllWeatherInfo();
+    PubSub.publish(LOADER);
 });
 
 PubSub.subscribe(EVENT_LISTENERS, addHeaderEventListeners);
