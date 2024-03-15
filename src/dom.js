@@ -6,6 +6,7 @@ export const LAYOUT = 'load page elements';
 export const CLEAR_DOM = 'remove any existing dom elements except the search bar';
 export const CHANGE_UNITS = 'change the units that are being displayed';
 export const EVENT_LISTENERS = 'add all event listeners to the page';
+export const LOADER = 'toggle loader display';
 
 const body = document.querySelector('body');
 
@@ -77,8 +78,120 @@ function createHeader(){
     body.appendChild(header);
 }
 
-function addHourlyGroupBtnEventListeners(){
+function changeToNextHourGroup(event){
+    const visibleSlide = document.querySelector('.hour-group:not(.hide)');
+    const allCircleBtns = document.querySelectorAll('.hour-btn');
+
+    visibleSlide.classList.add('hide');
+
+    if(event.target.classList.contains('right-btn')){
+        if(visibleSlide.nextSibling !== null){
+            const hourGroupName = visibleSlide.nextSibling.classList[0];
+
+            visibleSlide.nextSibling.classList.remove('hide');
+
+            allCircleBtns.forEach((circleBtn) => {
+                if(circleBtn.classList.contains(hourGroupName)){
+                    circleBtn.classList.add('selected-btn');
+                }else{
+                    circleBtn.classList.remove('selected-btn');
+                }
+            });
+        }else{
+            const firstSlide = document.querySelector('.hour-group-1.hour-group');
     
+            firstSlide.classList.remove('hide');
+
+            allCircleBtns.forEach((circleBtn) => {
+                if(circleBtn.classList.contains('hour-group-1')){
+                    circleBtn.classList.add('selected-btn');
+                }else{
+                    circleBtn.classList.remove('selected-btn');
+                }
+            });
+        }
+    }else if(event.target.classList.contains('left-btn')){
+        const firstSlide = document.querySelector('.hour-group-1.hour-group');
+
+        if(visibleSlide !== firstSlide){
+            const hourGroupName = visibleSlide.previousSibling.classList[0];
+
+            visibleSlide.previousSibling.classList.remove('hide');
+
+            allCircleBtns.forEach((circleBtn) => {
+                if(circleBtn.classList.contains(hourGroupName)){
+                    circleBtn.classList.add('selected-btn');
+                }else{
+                    circleBtn.classList.remove('selected-btn');
+                }
+            });
+        }else{
+            const lastSlide = document.querySelector('.hour-group-3.hour-group');
+
+            lastSlide.classList.remove('hide');
+
+            allCircleBtns.forEach((circleBtn) => {
+                if(circleBtn.classList.contains('hour-group-3')){
+                    circleBtn.classList.add('selected-btn');
+                }else{
+                    circleBtn.classList.remove('selected-btn');
+                }
+            });
+        }
+    }
+}
+
+function selectHourGroup(event){
+    const selectedBtn = event.target;
+    const allBtns = document.querySelectorAll('.hour-btn');
+    const allGroups = document.querySelectorAll('.hour-group');
+
+    allBtns.forEach((btn) => {
+        if(btn !== selectedBtn){
+            btn.classList.remove('selected-btn');
+        }else{
+            btn.classList.add('selected-btn');
+        }
+    });
+
+    if(selectedBtn.classList.contains('hour-group-1')){
+        allGroups.forEach((group) => {
+            if(group.classList.contains('hour-group-1')){
+                group.classList.remove('hide');
+            }else{
+                group.classList.add('hide');
+            }
+        });
+    }else if(selectedBtn.classList.contains('hour-group-2')){
+        allGroups.forEach((group) => {
+            if(group.classList.contains('hour-group-2')){
+                group.classList.remove('hide');
+            }else{
+                group.classList.add('hide');
+            }
+        });
+    }else{
+        allGroups.forEach((group) => {
+            if(group.classList.contains('hour-group-3')){
+                group.classList.remove('hide');
+            }else{
+                group.classList.add('hide');
+            }
+        });
+    }
+}
+
+function addHourlyGroupBtnEventListeners(){
+    const slideDirectionBtns = document.querySelectorAll('.hour-direction-btn');
+    const slideBtns = document.querySelectorAll('.hour-btn');
+
+    slideDirectionBtns.forEach((directionBtn) => {
+        directionBtn.addEventListener('click', changeToNextHourGroup);
+    });
+
+    slideBtns.forEach((slideBtn) => {
+        slideBtn.addEventListener('click', selectHourGroup);
+    });
 }
 
 export function createCurrWeatherDomObj(obj){
@@ -277,11 +390,11 @@ export function createHourlyGroupContainer(){
     const rightBtn = document.createElement('button');
 
     btnContainer.classList.add('hour-btns-container');
-    leftBtn.classList.add('hour-direction-btn');
-    rightBtn.classList.add('hour-direction-btn');
-    grpBtn1.classList.add('hour-btn');
-    grpBtn2.classList.add('hour-btn');
-    grpBtn3.classList.add('hour-btn');
+    leftBtn.classList.add('hour-direction-btn', 'left-btn');
+    rightBtn.classList.add('hour-direction-btn', 'right-btn');
+    grpBtn1.classList.add('hour-btn', 'hour-group-1', 'selected-btn');
+    grpBtn2.classList.add('hour-btn', 'hour-group-2');
+    grpBtn3.classList.add('hour-btn', 'hour-group-3');
     nameContainer.classList.add('hourly-name-container');
     groupContainer.classList.add('hourly-group-container');
     groupContainer.classList.add('weather-info');
@@ -312,7 +425,12 @@ export function createHourlyGroup(groupNum){
 }
 
 export function addHourlyWeatherToGroup(groupNum, domObj){
-    const hourlyGroup = document.querySelector(`.hour-group-${groupNum}`);
+    const hourlyGroup = document.querySelector(`.hour-group-${groupNum}.hour-group`);
+    const firstGroupNum = 1;
+
+    if(groupNum !== firstGroupNum){
+        hourlyGroup.classList.add('hide');
+    }
 
     hourlyGroup.appendChild(domObj);
 }
@@ -333,8 +451,8 @@ function toggleUnitDisplay(){
 }
 
 function clearDom(){
-    if(document.body.hasChildNodes()){
-        const bodyChildren = Array.from(document.body.children);
+    if(body.hasChildNodes()){
+        const bodyChildren = Array.from(body.children);
 
         bodyChildren.forEach((child) => {
             if(child.classList.contains('weather-info')){
@@ -345,25 +463,44 @@ function clearDom(){
 }
 
 function createErrorMessage(){
-    const errorMessage = document.createElement('div');
-    errorMessage.textContent = 'ERROR';
+    const errorMessageContainer = document.createElement('div');
+    const errorMessageBkgd = document.createElement('div');
+    const errorMessage = document.createElement('p');
 
-    errorMessage.classList.add('error');
-    errorMessage.classList.add('hide');
+    errorMessage.textContent = 'ENTER A VALID U.S. ZIPCODE, U.K. POSTCODE, CANADA POSTALCODE OR CITY NAME';
+    
+    errorMessageContainer.classList.add('error');
+    errorMessageBkgd.classList.add('error-bkgd');
 
-    body.appendChild(errorMessage);
+    errorMessageBkgd.appendChild(errorMessage);
+    errorMessageContainer.appendChild(errorMessageBkgd);
+    body.appendChild(errorMessageContainer);
 }
 
 function displayErrorMessageDisplay(){
-    const errorMessage = document.querySelector('.error');
+    const errorMessage = document.querySelector('.error-bkgd');
 
-    errorMessage.classList.remove('hide');
+    errorMessage.classList.add('error-show');
 }
 
 function hideErrorMessageDisplay(){
-    const errorMessage = document.querySelector('.error');
+    const errorMessage = document.querySelector('.error-bkgd');
 
-    errorMessage.classList.add('hide');
+    errorMessage.classList.remove('error-show');
+}
+
+function toggleLoaderDisplay(){
+    const numOfLoadedElements = 2;
+    const loader = document.createElement('div');
+
+    loader.classList.add('loader');
+
+    if(body.children.length === numOfLoadedElements){
+        body.appendChild(loader);
+    }else{
+        // document.querySelector('.loader').remove();
+        console.log('placeholder');
+    }
 }
 
 PubSub.subscribe(DISPLAY_ERROR, displayErrorMessageDisplay);
@@ -372,3 +509,4 @@ PubSub.subscribe(LAYOUT, createHeader);
 PubSub.subscribe(LAYOUT, createErrorMessage);
 PubSub.subscribe(CHANGE_UNITS, toggleUnitDisplay);
 PubSub.subscribe(CLEAR_DOM, clearDom);
+// PubSub.subscribe(LOADER, toggleLoaderDisplay);
