@@ -12,7 +12,6 @@ html {
 :root {
     --main-color: rgb(243, 240, 240);
     --dark-main-color: rgb(51, 56, 61);
-    /* --sub-color: rgb(240, 239, 236); */
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
@@ -260,6 +259,10 @@ input:focus {
     background-color: var(--main-color);
 }
 
+.selected-btn {
+    background-color: var(--dark-main-color);
+}
+
 .hour-btns-container > .hour-direction-btn:first-child {
     background: no-repeat url('./assets/chevron-left.svg');
 }
@@ -297,6 +300,196 @@ input:focus {
     margin-bottom: 20px;
 }
 
+.error {
+    overflow-x: hidden;
+    position: absolute;
+    width: 100%;
+    height: 80px;
+    top: 63px;
+}
+.error-bkgd {
+    position: absolute;
+    padding: 5px;
+    width: 400px;
+    height: fit-content;
+    top: -0;
+    right: -100%;
+    text-align: center;
+    background-color: rgb(185, 83, 83);
+    border-radius: 0 0 0 10px;
+    color: var(--main-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: 1.7s;
+}
+
+.error-show {
+    right: 0;
+}
+
+.loader {
+    position: absolute;
+    /* top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+    border: 16px solid var(--main-color);
+    border-top: 16px solid var(--dark-main-color);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .hide {
     display: none;
+}
+
+@media screen and (max-width: 800px) {
+    header {
+        padding: 10px;
+    }
+
+    label {
+        display: none;
+    }
+
+    .unit-btn {
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .error-bkgd {
+        width: 70%;
+    }
+
+    .curr-weather {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    .curr-condition-text {
+        font-size: 40px;
+    }
+
+    .curr-weather > div:last-child {
+        font-size: 16px;
+    }
+
+    .daily-group {
+        grid-template: 50px repeat(3, 1fr) / 1fr;
+        min-width: fit-content;
+    }
+
+    .daily-name-container {
+        grid-column: 1 / 2;
+    }
+
+    .daily-weather {
+        width: 100%;
+        padding: 5px;
+        gap: 10px;
+    }
+
+    .daily-weather > p {
+        width: 100px;
+    }
+
+    .daily-group > .daily-weather:last-child {
+        grid-row: 4/5;
+    }
+
+    .daily-temp-container > div {
+        width: 55px;
+        font-size: 14px;
+    }
+
+    .daily-group > .daily-weather:nth-child(even) .min-temp-container {
+        background-color: white;
+    }
+
+    .hour-group {
+        flex-direction: column;
+    }
+
+    .hour-group > div:nth-child(odd),
+    .daily-group > .daily-weather:nth-child(even) {
+        background-color: var(--main-color);
+        border-radius: 5px;
+    }
+
+    .hour-group > div:nth-child(odd) > div {
+        background-color: white;
+    }
+
+    .hourly-weather,
+    .daily-weather {
+        flex-direction: row;
+        max-height: 50px;
+    }
+
+    .hourly-weather > p {
+        width: 56px;
+    }
+
+    .hourly-weather > img,
+    .daily-weather > img {
+        width: 45px;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .logo-name {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 280px) {
+    header {
+        gap: 10px;
+    }
+
+    .error {
+        top: 55px;
+    }
+
+    input {
+        min-width: 150px;
+        font-size: 12px;
+    }
+
+    .svg-icon-container {
+        display: none;
+    }
+
+    .unit-btn-container {
+        justify-content: end;
+    }
+
+    .curr-weather {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .curr-weather > div {
+        text-align: center;
+    }
+
+    .curr-weather > div:last-child {
+        text-align: center;
+    }
+
+    .temp-icon-container {
+        justify-content: center;
+    }
+
+    .daily-weather > p {
+        font-size: 16px;
+        width: 80px;
+    }
 }
