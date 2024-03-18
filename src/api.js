@@ -6,7 +6,7 @@ export const HIDE_ERROR = 'hide error message';
 const API_KEY = '69b56b4aea6d430eb7a222431240303';
 
 async function getDailyAndHourlyWeatherData(cityName){
-    const httpResponse = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${cityName}&days=3`, {mode: 'cors'});
+    const httpResponse = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${cityName}&days=3`, {mode: 'cors'});
     const responseBody = await httpResponse.json();
 
     return responseBody;
@@ -14,7 +14,7 @@ async function getDailyAndHourlyWeatherData(cityName){
 
 export async function getWeatherData(cityName) {
     try{
-        const httpResponse = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${cityName}`, {mode: 'cors'});
+        const httpResponse = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${cityName}`, {mode: 'cors'});
         const currWeatherResponseBody = await httpResponse.json();
 
         if('error' in currWeatherResponseBody){
