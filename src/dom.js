@@ -498,8 +498,7 @@ function toggleLoaderDisplay(){
     if(body.children.length === numOfLoadedElements){
         body.appendChild(loader);
     }else{
-        // document.querySelector('.loader').remove();
-        console.log('placeholder');
+        document.querySelector('.loader').remove();
     }
 }
 
@@ -509,4 +508,4 @@ PubSub.subscribe(LAYOUT, createHeader);
 PubSub.subscribe(LAYOUT, createErrorMessage);
 PubSub.subscribe(CHANGE_UNITS, toggleUnitDisplay);
 PubSub.subscribe(CLEAR_DOM, clearDom);
-// PubSub.subscribe(LOADER, toggleLoaderDisplay);
+PubSub.subscribe(LOADER, toggleLoaderDisplay);
