@@ -6,4 +6,4 @@ This weather app uses the WeatherAPI to provide users with a three day & hourly 
 
 In this project, I experimented with the Promise object, and used the methods within it to collect and use the data from the WeatherAPI. I also used async/await to become familiar with the different ways that promises can be implemented.
 
-Click [https://indigobill.github.io/weather-app/]() to view the live page.
+Click [here](https://indigobill.github.io/weather-app/) to view the live page.
